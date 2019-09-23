@@ -64,7 +64,7 @@ John Black is my name.
 The result of `bash`'s regex matching can be used to replace `sed` for a
 large number of use-cases.
 
-**CAVEAT**: This is one of the few platform dependant `bash` features.
+**CAVEAT**: This is one of the few platform dependent `bash` features.
 `bash` will use whatever regex engine is installed on the user's system.
 Stick to POSIX regex features if aiming for compatibility.
 
@@ -100,7 +100,7 @@ $ regex "red" '^(#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3}))$'
 
 ```shell
 is_hex_color() {
-    if [[ "$1" =~ ^(#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3}))$ ]]; then
+    if [[ $1 =~ ^(#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3}))$ ]]; then
         printf '%s\n' "${BASH_REMATCH[1]}"
     else
         printf '%s\n' "error: $1 is an invalid color."
@@ -116,6 +116,8 @@ is_hex_color "$color" || color="#FFFFFF"
 
 
 ## Split a string on a delimiter
+
+**CAVEAT:** Requires `bash` 4+
 
 This is an alternative to `cut`, `awk` and other tools.
 
@@ -205,6 +207,32 @@ HELLO
 
 $ upper "HELLO"
 HELLO
+```
+
+## Reverse a string case
+
+**CAVEAT:** Requires `bash` 4+
+
+**Example Function:**
+
+```sh
+reverse_case() {
+    # Usage: reverse_case "string"
+    printf '%s\n' "${1~~}"
+}
+```
+
+**Example Usage:**
+
+```shell
+$ reverse_case "hello"
+HELLO
+
+$ reverse_case "HeLlO"
+hElLo
+
+$ reverse_case "HELLO"
+hello
 ```
 
 ## Trim quotes from a string
@@ -308,22 +336,72 @@ $ rstrip "The Quick Brown Fox" " Fox"
 The Quick Brown
 ```
 
+## Percent-encode a string
+
+**Example Function:**
+
+```sh
+urlencode() {
+    # Usage: urlencode "string"
+    local LC_ALL=C
+    for (( i = 0; i < ${#1}; i++ )); do
+        : "${1:i:1}"
+        case "$_" in
+            [a-zA-Z0-9.~_-])
+                printf '%s' "$_"
+            ;;
+
+            *)
+                printf '%%%02X' "'$_"
+            ;;
+        esac
+    done
+    printf '\n'
+}
+```
+
+**Example Usage:**
+
+```shell
+$ urlencode "https://github.com/dylanaraps/pure-bash-bible"
+https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible
+```
+
+## Decode a percent-encoded string
+
+**Example Function:**
+
+```sh
+urldecode() {
+    # Usage: urldecode "string"
+    : "${1//+/ }"
+    printf '%b\n' "${_//%/\\x}"
+}
+```
+
+**Example Usage:**
+
+```shell
+$ urldecode "https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible"
+https://github.com/dylanaraps/pure-bash-bible
+```
+
 ## Check if string contains a sub-string
 
 **Using a test:**
 
 ```shell
-if [[ "$var" == *sub_string* ]]; then
+if [[ $var == *sub_string* ]]; then
     printf '%s\n' "sub_string is in var."
 fi
 
 # Inverse (substring not in string).
-if [[ "$var" != *sub_string* ]]; then
+if [[ $var != *sub_string* ]]; then
     printf '%s\n' "sub_string is not in var."
 fi
 
 # This works for arrays too!
-if [[ "${arr[*]}" == *sub_string* ]]; then
+if [[ ${arr[*]} == *sub_string* ]]; then
     printf '%s\n' "sub_string is in array."
 fi
 ```
@@ -349,12 +427,12 @@ esac
 ## Check if string starts with sub-string
 
 ```shell
-if [[ "$var" == sub_string* ]]; then
+if [[ $var == sub_string* ]]; then
     printf '%s\n' "var starts with sub_string."
 fi
 
 # Inverse (var does not start with sub_string).
-if [[ "$var" != sub_string* ]]; then
+if [[ $var != sub_string* ]]; then
     printf '%s\n' "var does not start with sub_string."
 fi
 ```
@@ -362,12 +440,12 @@ fi
 ## Check if string ends with sub-string
 
 ```shell
-if [[ "$var" == *sub_string ]]; then
+if [[ $var == *sub_string ]]; then
     printf '%s\n' "var ends with sub_string."
 fi
 
 # Inverse (var does not end with sub_string).
-if [[ "$var" != *sub_string ]]; then
+if [[ $var != *sub_string ]]; then
     printf '%s\n' "var does not end with sub_string."
 fi
 ```

@@ -1,3 +1,7 @@
+<p align="center"><b>NEW: <a href="https://github.com/dylanaraps/pure-sh-bible">pure sh bible (📖 A collection of pure POSIX sh alternatives to external processes).</a></b></p>
+
+<br>
+
 <p align="center"><img src="https://raw.githubusercontent.com/odb/official-bash-logo/master/assets/Logos/Icons/PNG/512x512.png" width="200px"></p>
 <h1 align="center">pure bash bible</h1> <p
 align="center">A collection of pure bash alternatives to external
@@ -6,7 +10,6 @@ processes.</p>
 <p align="center"> <a
 href="https://travis-ci.com/dylanaraps/pure-bash-bible"><img
 src="https://travis-ci.com/dylanaraps/pure-bash-bible.svg?branch=master"></a>
-<a href="https://discord.gg/yfa5BDw"><img src="https://img.shields.io/discord/440354555197128704.svg"></a>
 <a href="./LICENSE.md"><img
 src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 </p>
@@ -17,7 +20,7 @@ src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 <img src="https://s3.amazonaws.com/titlepages.leanpub.com/bash/hero" width="40%" align="right">
 </a>
 
-The goal of this book is to document known and unknown methods of doing various tasks using only built-in `bash` features. Using the snippets from this bible can help remove unneeded dependencies from scripts and in most cases make them faster. I came across these tips and discovered a few while developing [neofetch](https://github.com/dylanaraps/neofetch), [pxltrm](https://github.com/dylanaraps/pxltrm) and other smaller projects.
+The goal of this book is to document commonly-known and lesser-known methods of doing various tasks using only built-in `bash` features. Using the snippets from this bible can help remove unneeded dependencies from scripts and in most cases make them faster. I came across these tips and discovered a few while developing [neofetch](https://github.com/dylanaraps/neofetch), [pxltrm](https://github.com/dylanaraps/pxltrm) and other smaller projects.
 
 The snippets below are linted using `shellcheck` and tests have been written where applicable. Want to contribute? Read the [CONTRIBUTING.md](https://github.com/dylanaraps/pure-bash-bible/blob/master/CONTRIBUTING.md). It outlines how the unit tests work and what is required when adding snippets to the bible.
 
@@ -43,11 +46,14 @@ See something incorrectly described, buggy or outright wrong? Open an issue or s
     * [Split a string on a delimiter](#split-a-string-on-a-delimiter)
     * [Change a string to lowercase](#change-a-string-to-lowercase)
     * [Change a string to uppercase](#change-a-string-to-uppercase)
+    * [Reverse a string case](#reverse-a-string-case)
     * [Trim quotes from a string](#trim-quotes-from-a-string)
     * [Strip all instances of pattern from string](#strip-all-instances-of-pattern-from-string)
     * [Strip first occurrence of pattern from string](#strip-first-occurrence-of-pattern-from-string)
     * [Strip pattern from start of string](#strip-pattern-from-start-of-string)
     * [Strip pattern from end of string](#strip-pattern-from-end-of-string)
+    * [Percent-encode a string](#percent-encode-a-string)
+    * [Decode a percent-encoded string](#decode-a-percent-encoded-string)
     * [Check if string contains a sub-string](#check-if-string-contains-a-sub-string)
     * [Check if string starts with sub-string](#check-if-string-starts-with-sub-string)
     * [Check if string ends with sub-string](#check-if-string-ends-with-sub-string)
@@ -78,6 +84,7 @@ See something incorrectly described, buggy or outright wrong? Open an issue or s
     * [Get the base-name of a file path](#get-the-base-name-of-a-file-path)
 * [VARIABLES](#variables)
     * [Assign and access a variable using a variable](#assign-and-access-a-variable-using-a-variable)
+    * [Name a variable based on another variable](#name-a-variable-based-on-another-variable)
 * [ESCAPE SEQUENCES](#escape-sequences)
     * [Text Colors](#text-colors)
     * [Text Attributes](#text-attributes)
@@ -147,6 +154,7 @@ See something incorrectly described, buggy or outright wrong? Open an issue or s
     * [Use `read` as an alternative to the `sleep` command](#use-read-as-an-alternative-to-the-sleep-command)
     * [Check if a program is in the user's PATH](#check-if-a-program-is-in-the-users-path)
     * [Get the current date using `strftime`](#get-the-current-date-using-strftime)
+    * [Get the username of the current user](#get-the-username-of-the-current-user)
     * [Generate a UUID V4](#generate-a-uuid-v4)
     * [Progress bars](#progress-bars)
     * [Get the list of functions in a script](#get-the-list-of-functions-in-a-script)
@@ -164,7 +172,7 @@ See something incorrectly described, buggy or outright wrong? Open an issue or s
 
 A collection of pure `bash` alternatives to external processes and programs. The `bash` scripting language is more powerful than people realise and most tasks can be accomplished without depending on external programs.
 
-Calling an external process in `bash` is expensive and excessive use will cause a noticeable slowdown. Scripts and programs written using built-in methods (*where applicable*) will be faster, require less dependencies and afford a better understanding of the language itself.
+Calling an external process in `bash` is expensive and excessive use will cause a noticeable slowdown. Scripts and programs written using built-in methods (*where applicable*) will be faster, require fewer dependencies and afford a better understanding of the language itself.
 
 The contents of this book provide a reference for solving problems encountered when writing programs and scripts in `bash`. Examples are in function formats showcasing how to incorporate these solutions into code.
 
@@ -237,7 +245,7 @@ John Black is my name.
 The result of `bash`'s regex matching can be used to replace `sed` for a
 large number of use-cases.
 
-**CAVEAT**: This is one of the few platform dependant `bash` features.
+**CAVEAT**: This is one of the few platform dependent `bash` features.
 `bash` will use whatever regex engine is installed on the user's system.
 Stick to POSIX regex features if aiming for compatibility.
 
@@ -273,7 +281,7 @@ $ regex "red" '^(#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3}))$'
 
 ```shell
 is_hex_color() {
-    if [[ "$1" =~ ^(#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3}))$ ]]; then
+    if [[ $1 =~ ^(#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3}))$ ]]; then
         printf '%s\n' "${BASH_REMATCH[1]}"
     else
         printf '%s\n' "error: $1 is an invalid color."
@@ -289,6 +297,8 @@ is_hex_color "$color" || color="#FFFFFF"
 
 
 ## Split a string on a delimiter
+
+**CAVEAT:** Requires `bash` 4+
 
 This is an alternative to `cut`, `awk` and other tools.
 
@@ -378,6 +388,32 @@ HELLO
 
 $ upper "HELLO"
 HELLO
+```
+
+## Reverse a string case
+
+**CAVEAT:** Requires `bash` 4+
+
+**Example Function:**
+
+```sh
+reverse_case() {
+    # Usage: reverse_case "string"
+    printf '%s\n' "${1~~}"
+}
+```
+
+**Example Usage:**
+
+```shell
+$ reverse_case "hello"
+HELLO
+
+$ reverse_case "HeLlO"
+hElLo
+
+$ reverse_case "HELLO"
+hello
 ```
 
 ## Trim quotes from a string
@@ -481,22 +517,72 @@ $ rstrip "The Quick Brown Fox" " Fox"
 The Quick Brown
 ```
 
+## Percent-encode a string
+
+**Example Function:**
+
+```sh
+urlencode() {
+    # Usage: urlencode "string"
+    local LC_ALL=C
+    for (( i = 0; i < ${#1}; i++ )); do
+        : "${1:i:1}"
+        case "$_" in
+            [a-zA-Z0-9.~_-])
+                printf '%s' "$_"
+            ;;
+
+            *)
+                printf '%%%02X' "'$_"
+            ;;
+        esac
+    done
+    printf '\n'
+}
+```
+
+**Example Usage:**
+
+```shell
+$ urlencode "https://github.com/dylanaraps/pure-bash-bible"
+https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible
+```
+
+## Decode a percent-encoded string
+
+**Example Function:**
+
+```sh
+urldecode() {
+    # Usage: urldecode "string"
+    : "${1//+/ }"
+    printf '%b\n' "${_//%/\\x}"
+}
+```
+
+**Example Usage:**
+
+```shell
+$ urldecode "https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible"
+https://github.com/dylanaraps/pure-bash-bible
+```
+
 ## Check if string contains a sub-string
 
 **Using a test:**
 
 ```shell
-if [[ "$var" == *sub_string* ]]; then
+if [[ $var == *sub_string* ]]; then
     printf '%s\n' "sub_string is in var."
 fi
 
 # Inverse (substring not in string).
-if [[ "$var" != *sub_string* ]]; then
+if [[ $var != *sub_string* ]]; then
     printf '%s\n' "sub_string is not in var."
 fi
 
 # This works for arrays too!
-if [[ "${arr[*]}" == *sub_string* ]]; then
+if [[ ${arr[*]} == *sub_string* ]]; then
     printf '%s\n' "sub_string is in array."
 fi
 ```
@@ -522,12 +608,12 @@ esac
 ## Check if string starts with sub-string
 
 ```shell
-if [[ "$var" == sub_string* ]]; then
+if [[ $var == sub_string* ]]; then
     printf '%s\n' "var starts with sub_string."
 fi
 
 # Inverse (var does not start with sub_string).
-if [[ "$var" != sub_string* ]]; then
+if [[ $var != sub_string* ]]; then
     printf '%s\n' "var does not start with sub_string."
 fi
 ```
@@ -535,12 +621,12 @@ fi
 ## Check if string ends with sub-string
 
 ```shell
-if [[ "$var" == *sub_string ]]; then
+if [[ $var == *sub_string ]]; then
     printf '%s\n' "var ends with sub_string."
 fi
 
 # Inverse (var does not end with sub_string).
-if [[ "$var" != *sub_string ]]; then
+if [[ $var != *sub_string ]]; then
     printf '%s\n' "var does not end with sub_string."
 fi
 ```
@@ -554,6 +640,8 @@ fi
 
 Enabling `extdebug` allows access to the `BASH_ARGV` array which stores
 the current function’s arguments in reverse.
+
+**CAVEAT**: Requires `shopt -s compat44` in `bash` 5.0+.
 
 **Example Function:**
 
@@ -591,6 +679,8 @@ allows us to effectively remove array duplicates.
 
 **CAVEAT:** Requires `bash` 4+
 
+**CAVEAT:** List order may not stay the same.
+
 **Example Function:**
 
 ```sh
@@ -599,7 +689,7 @@ remove_array_dups() {
     declare -A tmp_array
 
     for i in "$@"; do
-        [[ "$i" ]] && IFS=" " tmp_array["${i:- }"]=1
+        [[ $i ]] && IFS=" " tmp_array["${i:- }"]=1
     done
 
     printf '%s\n' "${!tmp_array[@]}"
@@ -722,12 +812,12 @@ arr=(apples oranges tomatoes)
 
 # Elements and index.
 for i in "${!arr[@]}"; do
-    printf '%s\n' "${arr[$i]}"
+    printf '%s\n' "${arr[i]}"
 done
 
 # Alternative method.
 for ((i=0;i<${#arr[@]};i++)); do
-    printf '%s\n' "${arr[$i]}"
+    printf '%s\n' "${arr[i]}"
 done
 ```
 
@@ -792,8 +882,13 @@ file_data="$(<"file")"
 Alternative to the `cat` command.
 
 ```shell
-# Bash <4
+# Bash <4 (discarding empty lines).
 IFS=$'\n' read -d "" -ra file_data < "file"
+
+# Bash <4 (preserving empty lines).
+while read -r line; do
+    file_data+=("$line")
+done < "file"
 
 # Bash 4+
 mapfile -t file_data < "file"
@@ -944,11 +1039,11 @@ printf '' >file
 extract() {
     # Usage: extract file "opening marker" "closing marker"
     while IFS=$'\n' read -r line; do
-        [[ "$extract" && "$line" != "$3" ]] && \
+        [[ $extract && $line != "$3" ]] &&
             printf '%s\n' "$line"
 
-        [[ "$line" == "$2" ]] && extract=1
-        [[ "$line" == "$3" ]] && extract=
+        [[ $line == "$2" ]] && extract=1
+        [[ $line == "$3" ]] && extract=
     done < "$1"
 }
 ```
@@ -975,7 +1070,24 @@ Alternative to the `dirname` command.
 ```sh
 dirname() {
     # Usage: dirname "path"
-    printf '%s\n' "${1%/*}/"
+    local tmp=${1:-.}
+
+    [[ $tmp != *[!/]* ]] && {
+        printf '/\n'
+        return
+    }
+
+    tmp=${tmp%%"${tmp##*[!/]}"}
+
+    [[ $tmp != */* ]] && {
+        printf '.\n'
+        return
+    }
+
+    tmp=${tmp%/*}
+    tmp=${tmp%%"${tmp##*[!/]}"}
+
+    printf '%s\n' "${tmp:-/}"
 }
 ```
 
@@ -983,10 +1095,10 @@ dirname() {
 
 ```shell
 $ dirname ~/Pictures/Wallpapers/1.jpg
-/home/black/Pictures/Wallpapers/
+/home/black/Pictures/Wallpapers
 
 $ dirname ~/Pictures/Downloads/
-/home/black/Pictures/
+/home/black/Pictures
 ```
 
 ## Get the base-name of a file path
@@ -997,9 +1109,14 @@ Alternative to the `basename` command.
 
 ```sh
 basename() {
-    # Usage: basename "path"
-    : "${1%/}"
-    printf '%s\n' "${_##*/}"
+    # Usage: basename "path" ["suffix"]
+    local tmp
+
+    tmp=${1%"${1##*[!/]}"}
+    tmp=${tmp##*/}
+    tmp=${tmp%"${2/"$tmp"}"}
+
+    printf '%s\n' "${tmp:-/}"
 }
 ```
 
@@ -1008,6 +1125,9 @@ basename() {
 ```shell
 $ basename ~/Pictures/Wallpapers/1.jpg
 1.jpg
+
+$ basename ~/Pictures/Wallpapers/1.jpg .jpg
+1
 
 $ basename ~/Pictures/Downloads/
 Downloads
@@ -1021,14 +1141,37 @@ Downloads
 ## Assign and access a variable using a variable
 
 ```shell
-hello_world="test"
+$ hello_world="value"
 
 # Create the variable name.
-var1="world"
-var2="hello_${var1}"
+$ var="world"
+$ ref="hello_$var"
 
-# Print the value of the variable name stored in 'hello_$var1'.
-printf '%s\n' "${!var2}"
+# Print the value of the variable name stored in 'hello_$var'.
+$ printf '%s\n' "${!ref}"
+value
+```
+
+Alternatively, on `bash` 4.3+:
+
+```shell
+$ hello_world="value"
+$ var="world"
+
+# Declare a nameref.
+$ declare -n ref=hello_$var
+
+$ printf '%s\n' "$ref"
+value
+```
+
+## Name a variable based on another variable
+
+```shell
+$ var="world"
+$ declare "hello_$var=value"
+$ printf '%s\n' "$hello_world"
+value
 ```
 
 <!-- CHAPTER END -->
@@ -1051,15 +1194,20 @@ Contrary to popular belief, there is no issue in utilizing raw escape sequences.
 
 ## Text Attributes
 
+**NOTE:** Prepend 2 to any code below to turn it's effect off
+(examples: 21=bold text off, 22=faint text off, 23=italic text off).
+
 | Sequence | What does it do? |
 | -------- | ---------------- |
-| `\e[m`  | Reset text formatting and colors.
+| `\e[m` | Reset text formatting and colors. |
 | `\e[1m` | Bold text. |
 | `\e[2m` | Faint text. |
 | `\e[3m` | Italic text. |
 | `\e[4m` | Underline text. |
-| `\e[5m` | Slow blink. |
-| `\e[7m` | Swap foreground and background colors. |
+| `\e[5m` | Blinking text. |
+| `\e[7m` | Highlighted text. |
+| `\e[8m` | Hidden text. |
+| `\e[9m` | Strike-through text. |
 
 
 ## Cursor Movement
@@ -1100,7 +1248,7 @@ Contrary to popular belief, there is no issue in utilizing raw escape sequences.
 | --------- | ---------------- |
 | `${!VAR}` | Access a variable based on the value of `VAR`.
 | `${!VAR*}` | Expand to `IFS` separated list of variable names starting with `VAR`. |
-| `${!VAR@}` | Expand to `IFS` separated list of variable names starting with `VAR`. |
+| `${!VAR@}` | Expand to `IFS` separated list of variable names starting with `VAR`. If double-quoted, each variable name expands to a separate word. |
 
 
 ## Replacement
@@ -1142,6 +1290,8 @@ Contrary to popular belief, there is no issue in utilizing raw escape sequences.
 | `${VAR^^}` | Uppercase all characters. | `bash 4+` |
 | `${VAR,}` | Lowercase first character. | `bash 4+` |
 | `${VAR,,}` | Lowercase all characters. | `bash 4+` |
+| `${VAR~}` | Reverse case of first character. | `bash 4+` |
+| `${VAR~~}` | Reverse case of all characters. | `bash 4+` |
 
 
 ## Default Value
@@ -1424,12 +1574,15 @@ Use `#!/usr/bin/env bash` instead of `#!/bin/bash`.
 - The former searches the user's `PATH` to find the `bash` binary.
 - The latter assumes it is always installed to `/bin/` which can cause issues.
 
+**NOTE**: There are times when one may have a good reason for using `#!/bin/bash` or another direct path to the binary.
+
+
 ```shell
 # Right:
 
     #!/usr/bin/env bash
 
-# Wrong:
+# Less right:
 
     #!/bin/bash
 ```
@@ -1740,16 +1893,16 @@ f()for i in "$@"; do echo "$i"; done
 ```shell
 # One line
 # Note: The 3rd statement may run when the 1st is true
-[[ "$var" == hello ]] && echo hi || echo bye
-[[ "$var" == hello ]] && { echo hi; echo there; } || echo bye
+[[ $var == hello ]] && echo hi || echo bye
+[[ $var == hello ]] && { echo hi; echo there; } || echo bye
 
 # Multi line (no else, single statement)
 # Note: The exit status may not be the same as with an if statement
-[[ "$var" == hello ]] && \
+[[ $var == hello ]] &&
     echo hi
 
 # Multi line (no else)
-[[ "$var" == hello ]] && {
+[[ $var == hello ]] && {
     echo hi
     # ...
 }
@@ -1803,9 +1956,9 @@ Surprisingly, `sleep` is an external command and not a `bash` built-in.
 
 ```sh
 read_sleep() {
-    # Usage: sleep 1
-    #        sleep 0.2
-    read -rst "${1:-1}" -N 999
+    # Usage: read_sleep 1
+    #        read_sleep 0.2
+    read -rt "$1" <> <(:) || :
 }
 ```
 
@@ -1815,6 +1968,18 @@ read_sleep() {
 read_sleep 1
 read_sleep 0.1
 read_sleep 30
+```
+
+For performance-critical situations, where it is not economic to open and close an excessive number of file descriptors, the allocation of a file descriptor may be done only once for all invocations of `read`:
+
+(See the generic original implementation at https://blog.dhampir.no/content/sleeping-without-a-subprocess-in-bash-and-how-to-sleep-forever)
+
+```shell
+exec {sleep_fd}<> <(:)
+while some_quick_test; do
+    # equivalent of sleep 0.001
+    read -t 0.001 -u $sleep_fd
+done
 ```
 
 ## Check if a program is in the user's PATH
@@ -1875,7 +2040,20 @@ $ printf '%s\n' "$date"
 Fri 15 Jun  - 10:00 AM
 ```
 
+## Get the username of the current user
+
+**CAVEAT:** Requires `bash` 4.4+
+
+```shell
+$ : \\u
+# Expand the parameter as if it were a prompt string.
+$ printf '%s\n' "${_@P}"
+black
+```
+
 ## Generate a UUID V4
+
+**CAVEAT**: The generated value is not cryptographically secure.
 
 **Example Function:**
 
@@ -1997,7 +2175,7 @@ bkr ./some_script.sh # some_script.sh is now running in the background
 
 Thanks for reading! If this bible helped you in any way and you'd like to give back, consider donating. Donations give me the time to make this the best resource possible. Can't donate? That's OK, star the repo and share it with your friends!
 
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=V7QNJNKS3WYVS"><img src="https://img.shields.io/badge/donate-paypal-yellow.svg"></a> <a href="https://www.patreon.com/dyla"><img src="https://img.shields.io/badge/donate-patreon-yellow.svg"> </a><a href="https://liberapay.com/2211/"><img src="https://img.shields.io/badge/donate-liberapay-yellow.svg"></a>
+<a href="https://www.patreon.com/dyla"><img src="https://img.shields.io/badge/donate-patreon-yellow.svg"></a>
 
 
 Rock on. 🤘

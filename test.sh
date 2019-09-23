@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck source=/dev/null
+# shellcheck source=/dev/null disable=2178,2128
 #
 # Tests for the Pure Bash Bible.
 
@@ -28,6 +28,11 @@ test_upper() {
     assert_equals "$result" "HELLO"
 }
 
+test_reverse_case() {
+    result="$(reverse_case "HeLlO")"
+    assert_equals "$result" "hElLo"
+}
+
 test_trim_quotes() {
     result="$(trim_quotes "\"te'st' 'str'ing\"")"
     assert_equals "$result" "test string"
@@ -53,14 +58,21 @@ test_rstrip() {
     assert_equals "$result" "Hello"
 }
 
-test_reverse_array() {
-    IFS=$'\n' read -d "" -ra result < <(reverse_array 1 2 3 4 5)
-    assert_equals "${result[*]}" "5 4 3 2 1"
+test_urlencode() {
+    result="$(urlencode "https://github.com/dylanaraps/pure-bash-bible")"
+    assert_equals "$result" "https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible"
 }
 
-test_remove_array_dups() {
-    IFS=$'\n' read -d "" -ra result < <(remove_array_dups 1 1 2 2 3 3 4 5)
-    assert_equals "${result[*]}" "1 2 3 4 5"
+test_urldecode() {
+    result="$(urldecode "https%3A%2F%2Fgithub.com%2Fdylanaraps%2Fpure-bash-bible")"
+    assert_equals "$result" "https://github.com/dylanaraps/pure-bash-bible"
+}
+
+test_reverse_array() {
+    shopt -s compat44
+    IFS=$'\n' read -d "" -ra result < <(reverse_array 1 2 3 4 5)
+    assert_equals "${result[*]}" "5 4 3 2 1"
+    shopt -u compat44
 }
 
 test_cycle() {
@@ -101,7 +113,46 @@ test_count() {
 
 test_dirname() {
     result="$(dirname "/home/black/Pictures/Wallpapers/1.jpg")"
-    assert_equals "$result" "/home/black/Pictures/Wallpapers/"
+    assert_equals "$result" "/home/black/Pictures/Wallpapers"
+
+    result="$(dirname "/")"
+    assert_equals "$result" "/"
+
+    result="$(dirname "/foo")"
+    assert_equals "$result" "/"
+
+    result="$(dirname ".")"
+    assert_equals "$result" "."
+
+    result="$(dirname "/foo/foo")"
+    assert_equals "$result" "/foo"
+
+    result="$(dirname "something/")"
+    assert_equals "$result" "."
+
+    result="$(dirname "//")"
+    assert_equals "$result" "/"
+
+    result="$(dirname "//foo")"
+    assert_equals "$result" "/"
+
+    result="$(dirname "")"
+    assert_equals "$result" "."
+
+    result="$(dirname "something//")"
+    assert_equals "$result" "."
+
+    result="$(dirname "something/////////////////////")"
+    assert_equals "$result" "."
+
+    result="$(dirname "something/////////////////////a")"
+    assert_equals "$result" "something"
+
+    result="$(dirname "something//////////.///////////")"
+    assert_equals "$result" "something"
+
+    result="$(dirname "//////")"
+    assert_equals "$result" "/"
 }
 
 test_basename() {

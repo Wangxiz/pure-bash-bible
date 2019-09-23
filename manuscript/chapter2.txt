@@ -5,6 +5,8 @@
 Enabling `extdebug` allows access to the `BASH_ARGV` array which stores
 the current function’s arguments in reverse.
 
+**CAVEAT**: Requires `shopt -s compat44` in `bash` 5.0+.
+
 **Example Function:**
 
 ```sh
@@ -41,6 +43,8 @@ allows us to effectively remove array duplicates.
 
 **CAVEAT:** Requires `bash` 4+
 
+**CAVEAT:** List order may not stay the same.
+
 **Example Function:**
 
 ```sh
@@ -49,7 +53,7 @@ remove_array_dups() {
     declare -A tmp_array
 
     for i in "$@"; do
-        [[ "$i" ]] && IFS=" " tmp_array["${i:- }"]=1
+        [[ $i ]] && IFS=" " tmp_array["${i:- }"]=1
     done
 
     printf '%s\n' "${!tmp_array[@]}"
